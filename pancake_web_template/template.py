@@ -80,6 +80,7 @@ def _patch_resolve_response():
     async def _patched_resolve(result, _handler=None):
         # 如果 handler 有 @template 标记且返回 dict，渲染模板
         if _handler and isinstance(result, dict) and hasattr(_handler, "_template_name"):
+            logger.info(f"渲染模板: {_handler._template_name}")
             return render(_handler._template_name, **result)
         return await _original_resolve(result)
 

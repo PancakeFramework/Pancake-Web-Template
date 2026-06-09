@@ -20,18 +20,15 @@ class Main(InitAction):
     def __init__(self):
         from pancake.registry import export
 
-        from pancake_web_template.template import render, template, register_filter
+        from pancake_web_template.template import render, template, register_filter, _patch_resolve_response
         export(render)
         export(template)
         export(register_filter)
 
-        logger.info("模板渲染插件已加载")
-
-    def build(self):
-        """猴子补丁: 扩展 web 插件的 resolve_response"""
-        from pancake_web_template.template import _patch_resolve_response
+        # 猴子补丁: 扩展 web 插件的 resolve_response
         _patch_resolve_response()
-        logger.info("已扩展 web 插件的响应解析（模板渲染支持）")
+
+        logger.info("模板渲染插件已加载")
 
     def check(self) -> bool:
         """环境检查"""

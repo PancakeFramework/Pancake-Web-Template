@@ -77,12 +77,15 @@ def _patch_resolve_response():
 
     _original_resolve = web_decorators.resolve_response
 
-    async def _patched_resolve(result, _handler=None):
+    async def _patched_resolve(result, _handler=None, request=None):
         # 如果 handler 有 @template 标记且返回 dict，渲染模板
         if _handler and isinstance(result, dict) and hasattr(_handler, "_template_name"):
             logger.info(f"渲染模板: {_handler._template_name}")
-            return render(_handler._template_name, **result)
-        return await _original_resolve(result)
+            context = dict(result)
+            if request is not None:
+                context["request"] = request
+            return render(_handler._template_name, **context)
+        return await _original_resolve(result, _handler, request)
 
     web_decorators.resolve_response = _patched_resolve
     logger.debug("resolve_response 已补丁")
